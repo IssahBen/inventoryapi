@@ -42,6 +42,23 @@ module Api
         render json: serialize_product_edit(product), status: :ok
       end
 
+      def update_product
+        product = Product.find_by(id: params[:id])
+        p params[:id]
+        return render json: { error: 'Product not found' }, status: :not_found unless product
+
+        category = Category.find_or_create_by(name: product_params[:category].capitalize)
+        product.category_id = category.id
+
+        product.stock_items.first.update(quantity: product_params[:quantity]) if product.stock_items.any?
+
+        if product.update(product_params.except(:category, :quantity))
+          render json: { message: 'Product updated successfully' }, status: :ok
+        else
+          render json: { error: product.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+
       private
 
       def product_params

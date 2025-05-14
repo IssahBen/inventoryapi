@@ -14,6 +14,8 @@ Rails.application.routes.draw do
       post 'products', to: 'products#create'
       get 'products', to: 'products#products_list'
       get 'products/:id', to: 'products#edit_product'
+      post 'products/:id', to: 'products#update_product'
+      post 'buy', to: 'transactions#create'
       devise_scope :user do
         post 'register', to: 'registrations#create'
       end
