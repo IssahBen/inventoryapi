@@ -80,9 +80,12 @@ class Transaction < ApplicationRecord
       value = transaction.product.price * transaction.quantity
       total += value
     end
-    total / Transaction.where('created_at >= ?', Time.zone.now.beginning_of_day).count if Transaction.where(
+    result = total / Transaction.where('created_at >= ?', Time.zone.now.beginning_of_day).count if Transaction.where(
       'created_at >= ?', Time.zone.now.beginning_of_day
     ).count.positive?
+    return 0 if result.nil?
+
+    result
   end
 
   def self.week_average_order_value
