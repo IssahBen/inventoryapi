@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       post 'buy', to: 'transactions#create'
       get 'reports', to: 'reports#sales_report'
       get 'reports/stock', to: 'reports#stock_report'
+      get 'reports/transactions', to: 'reports#transaction_report'
       devise_scope :user do
         post 'register', to: 'registrations#create'
       end

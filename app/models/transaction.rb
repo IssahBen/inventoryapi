@@ -143,4 +143,58 @@ class Transaction < ApplicationRecord
       .pluck('products.name', 'SUM(transactions.quantity)', 'products.price')
       .map { |name, quantity, price| { name: name, total_quantity: quantity, price: price } }
   end
+
+  def self.total_transactions_today
+    Transaction.where('created_at >= ?', Time.zone.now.beginning_of_day).count
+  end
+
+  def self.total_transactions_this_week
+    Transaction.where('created_at >= ?', Time.zone.now.beginning_of_week).count
+  end
+
+  def self.total_transactions_this_month
+    Transaction.where('created_at >= ?', Time.zone.now.beginning_of_month).count
+  end
+
+  def self.today_transactions
+    sales = Transaction.where('created_at >= ?', Time.zone.now.beginning_of_day)
+
+    sales.map do |transaction|
+      {
+        id: transaction.id,
+        product_name: transaction.product.name,
+        quantity: transaction.quantity,
+        total_value: transaction.product.price * transaction.quantity,
+        date: transaction.created_at.strftime('%Y-%m-%d %H:%M:%S')
+      }
+    end
+  end
+
+  def self.week_transactions
+    sales = Transaction.where('created_at >= ?', Time.zone.now.beginning_of_week)
+
+    sales.map do |transaction|
+      {
+        id: transaction.id,
+        product_name: transaction.product.name,
+        quantity: transaction.quantity,
+        total_value: transaction.product.price * transaction.quantity,
+        date: transaction.created_at.strftime('%Y-%m-%d %H:%M:%S')
+      }
+    end
+  end
+
+  def self.month_transactions
+    sales = Transaction.where('created_at >= ?', Time.zone.now.beginning_of_month)
+
+    sales.map do |transaction|
+      {
+        id: transaction.id,
+        product_name: transaction.product.name,
+        quantity: transaction.quantity,
+        total_value: transaction.product.price * transaction.quantity,
+        date: transaction.created_at.strftime('%Y-%m-%d %H:%M:%S')
+      }
+    end
+  end
 end
