@@ -33,7 +33,8 @@ class StockItem < ApplicationRecord
     StockItem.all.each do |stock_item|
       current_stock << {
         product_name: stock_item.product.name,
-        quantity: stock_item.quantity
+        quantity: stock_item.quantity,
+        reorder_level: stock_item.product.reorder_level
       }
     end
     current_stock
