@@ -1,44 +1,44 @@
+require 'ostruct'
+
 module Api
   module V1
     class ReportsController < ApplicationController
       def sales_report
-        render json: serialize_sales_report, status: :ok
+        render json: SalesReport.new, serializer: ::SalesReportSerializer, status: :ok
       end
 
       def stock_report
-        render json: serialize_stock_report, status: :ok
+        render json: StockReport.new, serializer: ::StockReportSerializer, status: :ok
       end
 
       def transaction_report
-        render json: serialize_transaction_report, status: :ok
+        render json: TransactionReport.new, serializer: TransactionReportSerializer, status: :ok
+      end
+
+      def transactions
+        p params
+        before_time_str = params.dig(:report, :scheduled_at)
+
+        if before_time_str
+          before_time = Time.iso8601(before_time_str)
+          @transactions = Transaction.where('created_at < ?', before_time)
+        else
+          @transactions = Transaction.all
+        end
+
+        transactions = @transactions.map do |transaction|
+          {
+            id: transaction.id,
+            product_name: transaction.product.name, # use snake_case here for consistency
+            total_value: transaction.product.price * transaction.quantity,
+            date: transaction.created_at
+          }
+        end
+
+        render json: transactions
       end
 
       private
-
-      def serialize_sales_report
-        { All: [{ title: 'Total Sale', value: Transaction.total_sales }, { title: 'Average Order value', value: Transaction.average_order_value }, { title: 'Total Orders', value: Transaction.total_quantity_sold }],
-          Day: [{ title: 'Total Sale', value: Transaction.day_sale },
-                { title: 'Average Order value', value: Transaction.day_average_order_value }, { title: 'Total Orders', value: Transaction.day_quantity_sold }],
-          Week: [{ title: 'Total Sale', value: Transaction.week_sale },
-                 { title: 'Average Order value', value: Transaction.week_average_order_value }, { title: 'Total Orders', value: Transaction.week_quantity_sold }],
-          Month: [{ title: 'Total Sale', value: Transaction.month_sale },
-                  { title: 'Average Order value', value: Transaction.month_average_order_value }, { title: 'Total Orders', value: Transaction.month_quantity_sold }],
-          Top: Transaction.top_3_selling_products }
-      end
-
-      def serialize_stock_report
-        { metrics: [{ title: 'Total Items', value: StockItem.total_items }, { title: 'Low Stock Items', value: StockItem.low_stock_items }, { title: 'Out of Stock Items', value: StockItem.out_of_stock_items }],
-          current_stock: StockItem.current_stock }
-      end
-
-      def serialize_transaction_report
-        { day: [{ title: 'Total Transactions', value: Transaction.total_transactions_today }],
-          week: [{ title: 'Total Transactions', value: Transaction.total_transactions_this_week }],
-          month: [{ title: 'Total Transactions', value: Transaction.total_transactions_this_month }],
-          today_transactions: Transaction.today_transactions,
-          week_transactions: Transaction.week_transactions,
-          month_transactions: Transaction.month_transactions }
-      end
     end
   end
 end

@@ -53,3 +53,6 @@ gem 'devise', '~> 4.9'
 
 gem 'rubocop', '~> 1.75'
 gem 'simple_token_authentication', '~> 1.0' # see semver.org
+
+# Gemfile
+gem 'active_model_serializers', '~> 0.10.0'

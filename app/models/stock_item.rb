@@ -39,4 +39,12 @@ class StockItem < ApplicationRecord
     end
     current_stock
   end
+
+  def self.total_inventory_value
+    total = 0
+    all.each do |stock_item|
+      total += stock_item.quantity * stock_item.product.price
+    end
+    total
+  end
 end
