@@ -22,6 +22,8 @@ Rails.application.routes.draw do
 
       post 'transactions', to: 'reports#transactions'
       devise_scope :user do
+        post 'password/forgot', to: 'passwords#create'
+        put 'password/reset', to: 'passwords#update'
         post 'register', to: 'registrations#create'
       end
     end

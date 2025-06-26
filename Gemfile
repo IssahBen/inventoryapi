@@ -56,3 +56,5 @@ gem 'simple_token_authentication', '~> 1.0' # see semver.org
 
 # Gemfile
 gem 'active_model_serializers', '~> 0.10.0'
+
+gem "dotenv", "~> 3.1"

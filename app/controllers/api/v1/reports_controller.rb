@@ -17,11 +17,15 @@ module Api
 
       def transactions
         p params
-        before_time_str = params.dig(:report, :scheduled_at)
+        scheduled_at_str = params.dig(:report, :scheduled_at)
 
-        if before_time_str
-          before_time = Time.iso8601(before_time_str)
-          @transactions = Transaction.where('created_at < ?', before_time)
+        if scheduled_at_str
+          scheduled_date = Time.iso8601(scheduled_at_str).to_date
+
+          start_of_day = scheduled_date.beginning_of_day
+          end_of_day = scheduled_date.end_of_day
+
+          @transactions = Transaction.where(created_at: start_of_day..end_of_day)
         else
           @transactions = Transaction.all
         end
@@ -29,9 +33,9 @@ module Api
         transactions = @transactions.map do |transaction|
           {
             id: transaction.id,
-            product_name: transaction.product.name, # use snake_case here for consistency
+            product_name: transaction.product.name,
             total_value: transaction.product.price * transaction.quantity,
-            date: transaction.created_at
+            date: transaction.created_at.strftime('%Y-%m-%d %H:%M:%S')
           }
         end
 
